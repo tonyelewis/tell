@@ -1,5 +1,5 @@
-#ifndef TELL_A
-#define TELL_A
+#ifndef _TELL_SOURCE_SRC_STACKTRACE_TELL_RETRIEVE_EXCEPTION_INFO_HPP
+#define _TELL_SOURCE_SRC_STACKTRACE_TELL_RETRIEVE_EXCEPTION_INFO_HPP
 
 #include "tell/detail/types.hpp"
 
@@ -19,29 +19,29 @@ namespace tell { namespace except {
 
 		/// \brief Tag-dispatch overload for getting the what() of a type that isn't a std::exception, so just return none
 		template <typename Ex>
-		::boost::optional<::std::string> get_what_of_std_exception_impl(const ::std::false_type &, ///< Type to indicate that std::exception *is not* a base of Ex
-		                                                                const Ex &
-		                                                                ) {
+		inline ::boost::optional<::std::string> get_what_of_std_exception_impl(const ::std::false_type &/*inherits_from_std_exception_tag*/, ///< Type to indicate that std::exception *is not* a base of Ex
+		                                                                     const Ex                &/*prm_value*/                        ///< The object of some type not derived from ::std::exception
+		                                                                     ) {
 			return ::boost::none;
 		}
 
 		/// \brief Tag-dispatch overload for getting the what() of a std::exception, so do that 
-		::boost::optional<::std::string> get_what_of_std_exception_impl(const ::std::true_type &, ///< Type to indicate that std::exception *is* a base of Ex
-		                                                                const std::exception &prm_value ///< The object of some type derived from ::std::exception
-		                                                                ) {
+		inline ::boost::optional<::std::string> get_what_of_std_exception_impl(const ::std::true_type &/* inherits_from_std_exception_tag */, ///< Type to indicate that std::exception *is* a base of Ex
+		                                                                     const std::exception   &prm_value                              ///< The object of some type derived from ::std::exception
+		                                                                     ) {
 			return ::std::string{ prm_value.what() };
 		}
 
 		/// \brief Return the what() from the specified value if it's of a type derived from std::exception, or none otherwise
 		template <typename Ex>
-		::boost::optional<::std::string> get_what_of_std_exception(const Ex &prm_value ///< The value to query
-		                                                           ) {
+		inline ::boost::optional<::std::string> get_what_of_std_exception(const Ex &prm_value ///< The value to query
+		                                                                  ) {
 			return get_what_of_std_exception_impl( ::std::is_base_of<::std::exception, std::decay_t<Ex>>{}, prm_value );
 		}
 
 		/// \brief Generate a string for the specified stacktrace, stripped of any frames from tell's throw_with_locn_and_stacktrace()
-		::std::string to_string_cleaned_of_throw_context(const ::boost::stacktrace::stacktrace &prm_stacktrace ///< The stacktrace to describe
-		                                                 ) {
+		inline ::std::string to_string_cleaned_of_throw_context(const ::boost::stacktrace::stacktrace &prm_stacktrace ///< The stacktrace to describe
+		                                                        ) {
 			// Lambda closure for whether the argument's `.name()` reveals it comes from tell's throw_with_locn_and_stacktrace()
 			const auto is_outside_throw_context = [] (const auto &x) {
 				return ! ::boost::algorithm::starts_with(
@@ -64,8 +64,8 @@ namespace tell { namespace except {
 	} // namespace detail
 
 	/// \brief Generate a string describing the specified boost::exception, retrieving info added by TELL_THROW()
-	std::string retrieve_exception_info(const boost::exception &prm_exception ///< The boost::exception, hopefully thrown via TELL_THROW
-	                                    ) {
+	inline std::string retrieve_exception_info(const boost::exception &prm_exception ///< The boost::exception, hopefully thrown via TELL_THROW
+	                                           ) {
 		const auto &file_value_ptr     = ::boost::get_error_info< ::boost::throw_file                           >( prm_exception );
 		const auto &line_value_ptr     = ::boost::get_error_info< ::boost::throw_line                           >( prm_exception );
 		const auto &function_value_ptr = ::boost::get_error_info< ::boost::throw_function                       >( prm_exception );
@@ -106,11 +106,11 @@ namespace tell { namespace except {
 	///        including context information about where the information is being retrieved
 	///
 	/// Don't use this function directly, use the macro TELL_RETRIEVE_EXCEPTION_INFO()
-	std::string retrieve_exception_info(const boost::exception               &prm_exception, ///< The boost::exception, hopefully thrown via TELL_THROW
-	                                    const detail::throw_function_value_t &prm_function,  ///< The name of the function containing the code that wants to retrieve this information
-	                                    const detail::throw_file_value_t     &prm_file,      ///< The name of the source file containing the code that wants to retrieve this information
-	                                    const detail::throw_line_value_t     &prm_line       ///< The number of the source line containing the code that wants to retrieve this information
-	                                    ) {
+	inline std::string retrieve_exception_info(const boost::exception               &prm_exception, ///< The boost::exception, hopefully thrown via TELL_THROW
+	                                           const detail::throw_function_value_t &prm_function,  ///< The name of the function containing the code that wants to retrieve this information
+	                                           const detail::throw_file_value_t     &prm_file,      ///< The name of the source file containing the code that wants to retrieve this information
+	                                           const detail::throw_line_value_t     &prm_line       ///< The number of the source line containing the code that wants to retrieve this information
+	                                           ) {
 		return "In '"
 			+ ::std::string   ( prm_function )
 			+ "' at "
@@ -121,10 +121,11 @@ namespace tell { namespace except {
 			+ retrieve_exception_info( prm_exception );
 	}
 
-}} // namespace tell::except
+} // namespace except
+} // namespace tell
 
 /// \brief Generate a string describing the specified boost::exception, retrieving info added by TELL_THROW()
 ///        including context information about where the information is being retrieved
 #define TELL_RETRIEVE_EXCEPTION_INFO(x) ::tell::except::retrieve_exception_info( ((x)), __FUNCTION__, __FILE__, __LINE__ )
 
-#endif // TELL_A
+#endif // _TELL_SOURCE_SRC_STACKTRACE_TELL_RETRIEVE_EXCEPTION_INFO_HPP

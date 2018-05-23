@@ -1,5 +1,5 @@
-#ifndef TELL_THROW_HPP
-#define TELL_THROW_HPP
+#ifndef _TELL_SOURCE_SRC_STACKTRACE_TELL_TELL_THROW_HPP
+#define _TELL_SOURCE_SRC_STACKTRACE_TELL_TELL_THROW_HPP
 
 #include <boost/stacktrace.hpp>
 
@@ -30,9 +30,11 @@ namespace tell { namespace except { namespace detail {
 		);
 	}
 
-} } } // namespace tell::except::detail
+} // namespace detail
+} // namespace except
+} // namespace tell
 
 /// \brief Use Boost exception to decorate the specified argument with the throw location and stacktrace
 #define TELL_THROW(x) ::tell::except::detail::throw_with_locn_and_stacktrace( ((x)), __FUNCTION__, __FILE__, __LINE__ )
 
-#endif // TELL_THROW_HPP
+#endif // _TELL_SOURCE_SRC_STACKTRACE_TELL_TELL_THROW_HPP
