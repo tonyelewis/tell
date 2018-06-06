@@ -35,6 +35,6 @@ namespace tell { namespace except { namespace detail {
 } // namespace tell
 
 /// \brief Use Boost exception to decorate the specified argument with the throw location and stacktrace
-#define TELL_THROW(x) ::tell::except::detail::throw_with_locn_and_stacktrace( ((x)), __FUNCTION__, __FILE__, __LINE__ )
+#define TELL_THROW(x) ::tell::except::detail::throw_with_locn_and_stacktrace( ((x)), BOOST_THROW_EXCEPTION_CURRENT_FUNCTION, __FILE__, __LINE__ )
 
 #endif // _TELL_SOURCE_SRC_STACKTRACE_TELL_TELL_THROW_HPP

@@ -6,6 +6,7 @@
 #include <boost/stacktrace.hpp>
 
 #include "tell/detail/types.hpp"
+#include "tell/stacktrace_to_cleaned_string.hpp"
 
 using namespace ::std::literals::string_literals;
 
@@ -21,6 +22,7 @@ namespace boost {
 	                                 char const * prm_file,     ///< The name of the file containing the assertion
 	                                 int64_t      prm_line      ///< The line number on which the assertion appears
 	                                 ) {
+		const auto prefixes_to_remove = { "boost::assertion_failed" };
 		// Output information about the failure, with frequent flushing
 		::std::cerr
 			<< "[ASSERTION ERROR] Failed assertion '" << ::std::flush
@@ -37,7 +39,10 @@ namespace boost {
 			<< " in '"                                << ::std::flush
 			<< prm_function
 			<< "'\nStacktrace:\n"                     << ::std::flush
-			<< ::boost::stacktrace::stacktrace()        << ::std::flush;
+			<< ::tell::except::detail::to_string_stripped_by_prefixes(
+				::boost::stacktrace::stacktrace(),
+				prefixes_to_remove
+			) << ::std::flush;
 			abort();
 	}
 
