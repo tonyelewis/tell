@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <boost/core/ignore_unused.hpp>
+
 #include "tell/stacktrace_to_cleaned_string.hpp"
 #include "tell/boost_assert.hpp"
 #include "tell/retrieve_exception_info.hpp"
@@ -64,29 +66,29 @@ namespace my { namespace stuff {
 
 } } // namespace my::stuff
 
-void deeper_fn() {
+void deeper_fn(const int &value) {
+
 	TELL_THROW( my::stuff::precondition_error( "it has all gone terribly wrong" ) );
-	std::cout
-		<< "Here is a stack trace :\n"
-		<< ::boost::stacktrace::stacktrace()
-		<< "\n\n\n";
 
-}
-
-void intermediate_fn() {
-	deeper_fn();
-}
-
-template <size_t other_value, typename T>
-void fn(const T &value) {
-	// intermediate_fn();
 	BOOST_ASSERT(
 		value < 1
 	);
+
 	BOOST_ASSERT_MSG(
 		value < 1,
 		( "The value must always be less than 1 because of rule X; it's currently " + ::std::to_string( value ) ).c_str()
 	);
+
+	::boost::ignore_unused( value );
+}
+
+void intermediate_fn(const int &value) {
+	deeper_fn( value );
+}
+
+template <size_t other_value, typename T>
+void fn(const T &value) {
+	intermediate_fn( value );
 }
 
 int main() {
